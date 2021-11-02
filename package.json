@@ -1,17 +1,23 @@
 {
+  "name": "flexi-human-hash",
+  "description": "Making hashes human readable, and giving the user control over how they look",
+  "version": "0.8.0",
+  "main": "index.js",
+  "author": "Adam Powers <apowers@ato.ms>",
+  "license": "MIT",
+  "directories": {
+    "lib": "lib",
+    "test": "test"
+  },
+  "scripts": {
+    "test": "mocha"
+  },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^5.2.0",
     "@typescript-eslint/parser": "^5.2.0",
     "chai": "^4.3.4",
     "eslint-plugin-old-c-programmer": "^1.0.1",
     "mocha": "^9.1.3"
-  },
-  "name": "flexi-human-hash",
-  "version": "1.0.0",
-  "main": "index.js",
-  "directories": {
-    "lib": "lib",
-    "test": "test"
   },
   "dependencies": {
     "ansi-colors": "^4.1.1",
@@ -99,11 +105,59 @@
     "yargs-unparser": "^2.0.0",
     "yocto-queue": "^0.1.0"
   },
-  "scripts": {
-    "test": "mocha"
-  },
-  "keywords": [],
-  "author": "Adam Powers <apowers@ato.ms>",
-  "license": "MIT",
-  "description": ""
+  "keywords": [
+    "id",
+    "uuid",
+    "shortid",
+    "readable-id",
+    "unique",
+    "universal",
+    "identifier",
+    "readable",
+    "sentence",
+    "uuid-v4",
+    "uuid-v5",
+    "mnemonic",
+    "random",
+    "name",
+    "generator",
+    "human",
+    "memorable",
+    "random",
+    "human-readable",
+    "hri",
+    "ids",
+    "string",
+    "english",
+    "noun",
+    "adjective",
+    "nouns",
+    "adjectives",
+    "hash",
+    "unique ids",
+    "unique identifier",
+    "human readable",
+    "digest",
+    "humanize",
+    "apikey",
+    "hex-to-words",
+    "uuid-to-words",
+    "guid-to-words",
+    "guid2words",
+    "uuid2words",
+    "human-readable-guid",
+    "human-readable-id",
+    "uuid-in-words",
+    "random-number-in-words",
+    "guid-in-words",
+    "words",
+    "alias",
+    "aliases",
+    "anonymise",
+    "anonymize",
+    "codename",
+    "codenamise",
+    "codenamize",
+    "secret"
+  ]
 }
