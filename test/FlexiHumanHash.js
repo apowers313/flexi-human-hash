@@ -238,13 +238,101 @@ describe("FlexiHumanHash", function() {
     });
 
     describe("default dictionaries", function() {
-        it("noun");
-        it("verb");
-        it("adjective");
-        it("decimal");
-        it("hex");
-        it("cities");
-        it("first-name");
-        it("last-name");
+        it("noun", function() {
+            let fhh = new FlexiHumanHash("{{noun}}");
+            let str = fhh.hash(randomBuf);
+            assert.isTrue(str === "quilter" || str === "afterlives");
+        });
+
+        it("verb", function() {
+            let fhh = new FlexiHumanHash("{{verb}}");
+            let str = fhh.hash(randomBuf);
+            assert.isTrue(str === "admixes" || str === "mistakes");
+        });
+
+        it("adjective", function() {
+            let fhh = new FlexiHumanHash("{{adjective}}");
+            let str = fhh.hash(randomBuf);
+            assert.isTrue(str === "nonmigratory" || str === "adjudicative");
+        });
+
+        describe("decimal", function() {
+            it("can be 1 digit", function() {
+                let fhh = new FlexiHumanHash("{{decimal 1}}");
+                let str = fhh.hash(randomBuf);
+                assert.isTrue(str === "0" || str === "8");
+            });
+
+            it("can be 14 digits", function() {
+                let fhh = new FlexiHumanHash("{{decimal 14}}");
+                let str = fhh.hash(randomBuf);
+                assert.isTrue(str === "71804836204125" || str === "1436092026461");
+            });
+
+            it("defaults to 4 digits", function() {
+                let fhh = new FlexiHumanHash("{{decimal}}");
+                let str = fhh.hash(randomBuf);
+                assert.isTrue(str === "8359" || str === "167");
+            });
+
+            it("throws on 15");
+            it("throws on 0");
+            it("throws on -1");
+        });
+
+        describe("hex", function() {
+            it("can be 1 digit", function() {
+                let fhh = new FlexiHumanHash("{{hex 1}}");
+                let str = fhh.hash("hi", {hashAlg: "md5"});
+                assert.isTrue(str === "4");
+            });
+
+            it("can be 13 digits", function() {
+                let fhh = new FlexiHumanHash("{{hex 13}}");
+                let str = fhh.hash("hi", {hashAlg: "md5"});
+                assert.isTrue(str === "49f68a5c8493e");
+            });
+
+            it("defaults to 4 nibbles", function() {
+                let fhh = new FlexiHumanHash("{{hex}}");
+                let str = fhh.hash("hi", {hashAlg: "md5"});
+                assert.isTrue(str === "49f6");
+            });
+
+            it("throws on 13");
+            it("throws on 0");
+            it("throws on -1");
+        });
+
+        it("city", function() {
+            this.slow(1000);
+            let fhh = new FlexiHumanHash("{{city}}");
+            let str = fhh.hash(randomBuf);
+            assert.isTrue(str === "Sankt Dionysen" || str === "Vụ Bản");
+        });
+
+        it("female-name", function() {
+            let fhh = new FlexiHumanHash("{{female-name}}");
+            let str = fhh.hash(randomBuf);
+            assert.isTrue(str === "Rosemaria" || str === "Ailey");
+        });
+
+        it("male-name", function() {
+            let fhh = new FlexiHumanHash("{{male-name}}");
+            let str = fhh.hash(randomBuf);
+            assert.isTrue(str === "Karoly" || str === "Adolpho");
+        });
+
+        it("first-name", function() {
+            let fhh = new FlexiHumanHash("{{first-name}}");
+            let str = fhh.hash(randomBuf);
+            assert.isTrue(str === "Ally" || str === "Stinky");
+        });
+
+        it("last-name", function() {
+            let fhh = new FlexiHumanHash("{{last-name}}");
+            let str = fhh.hash(randomBuf);
+            assert.isTrue(str === "Raleigh" || str === "Airlia");
+        });
     });
 });
