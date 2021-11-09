@@ -240,7 +240,14 @@ describe("FlexiHumanHash", function() {
 
         it("throws if dangerous format");
 
-        it("undoes transform");
+        it("undoes transform", function() {
+            let fhh = new FlexiHumanHash("{{test uppercase}}-{{test caps}}:{{test caps}} {{test uppercase}}");
+            let randomArr = [0b00000101, 0b00110000];
+            let str1 = fhh.hash(randomArr);
+            let numArr = fhh.unhash(str1);
+            assert.deepEqual(numArr, randomArr);
+        });
+
         it("undoes multiple transforms");
         it("throws on bad input");
     });
