@@ -53,8 +53,8 @@ fhh.hash("this is my password...", {hashAlg: "md5"});
 Reverse a string back to the original random number
 ``` js
 let fhh = new FlexiHumanHash("{{first-name lowercase}}-{{last-name lowercase}}-the-{{adjective}}-{{noun}}");
-fhh.unhash("francisca-straub-the-coldest-eagle");
-// Expected output: "42"
+let ret = fhh.unhash("francisca-straub-the-coldest-eagle");
+// Expected output: [57, 225, 104, 232, 109, 102, 74 ]
 ```
 
 Report how much entropy is used for a format to help understand likelihood of collisions

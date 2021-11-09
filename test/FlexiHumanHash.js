@@ -450,7 +450,9 @@ describe("FlexiHumanHash", function() {
 
         it("Reverse a string back to the original random number", function() {
             let fhh = new FlexiHumanHash("{{first-name lowercase}}-{{last-name lowercase}}-the-{{adjective}}-{{noun}}");
+            // let str = fhh.hash([57, 225, 104, 232, 109, 102, 74]);
             let ret = fhh.unhash("francisca-straub-the-coldest-eagle");
+            // Expected output: [57, 225, 104, 232, 109, 102, 74 ]
         });
 
         it("Report how much entropy is used for a format to help understand likelihood of collisions", function() {
