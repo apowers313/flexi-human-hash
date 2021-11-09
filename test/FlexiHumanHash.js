@@ -27,6 +27,8 @@ describe("FlexiHumanHash", function() {
         assert.isObject(fhh);
     });
 
+    it("throws if not constructed with string");
+
     describe("format", function() {
         it("accepts args", function() {
             new FlexiHumanHash("{{test}}");
@@ -170,6 +172,85 @@ describe("FlexiHumanHash", function() {
             str = fhh.hash("this is a very long string that is more than we need", {hashAlg: "sha256", hashSalt: "foo"});
             assert.strictEqual(str, "cat");
         });
+
+        it("throws on number");
+        it("throws on other bad inputs");
+    });
+
+    describe("unhash", function() {
+        it("undoes simple word", function() {
+            let fhh = new FlexiHumanHash("{{test}}");
+            let randomArr = [0b10100000];
+            let str1 = fhh.hash(randomArr);
+            console.log("str1", str1);
+            let numArr = fhh.unhash(str1);
+            assert.deepEqual(numArr, randomArr);
+        });
+
+        it("undoes word string", function() {
+            let fhh = new FlexiHumanHash("{{test}}-{{test}}:{{test}} {{test}}");
+            let randomArr = [0b00000101, 0b00110000];
+            let str1 = fhh.hash(randomArr);
+            let numArr = fhh.unhash(str1);
+            assert.deepEqual(numArr, randomArr);
+        });
+
+        it("works with regexp special characters", function() {
+            let fhh = new FlexiHumanHash(")*&#!^$*%)!|}{\][\":<./{{test}}@*#&$^(*%!)(_)+_|}{|}\][\;';\":\":,.,//?>?<><{{test}}@!$#@$@^%$#&^%$*&^)(*&_)*(_)+_-==][\][{}}|}{;';\":\":<>?><?.,/.,{{test}}|}{\][\][!&^@%#$(*&^)@$#)(#*&_)(*+_9=-09}{|]\":\":';'?><?><,./,/{{test}}{|}{|}{\][\][\][|}{|}{:\"\":./,/.,?><?><?><!@#$Q^%$#^%$&*^%(*&^)(*&_)()+_+_=-=");
+            // let fhh = new FlexiHumanHash("**{{test}}**{{test}}**{{test}}**{{test}}");
+            let randomArr = [0b00000101, 0b00110000];
+            let str1 = fhh.hash(randomArr);
+            let numArr = fhh.unhash(str1);
+            assert.deepEqual(numArr, randomArr);
+        });
+
+        it.skip("can repeatedly unhash", function() {
+            let fhh = new FlexiHumanHash("{{first-name lowercase}}-{{last-name lowercase}}-the-{{adjective}}-{{noun}}");
+            for (let i = 0; i < 1000000; i++) {
+                let rnd = Array.apply(null, {length: 8}).map((c) => Math.floor(Math.random() * 256));
+                console.log("rnd", rnd);
+                let str = fhh.hash(rnd);
+                let ret = fhh.unhash(str);
+                assert.strictEqual(rnd, ret);
+            }
+            // console.log(fhh.hash());
+            let ret = fhh.unhash("francisca-straub-the-coldest-eagle");
+            console.log("ret", ret);
+        });
+
+        it.skip("works with leading '1'", function() {
+            let fhh = new FlexiHumanHash("{{test}}-{{test}}-{{test}}-{{test}}-{{test}}-{{test}}-{{test}}-{{test}}");
+            let randomArr = [232, 109, 102, 74];
+            let str1 = fhh.hash(randomArr);
+            console.log("str1", str1);
+            let numArr = fhh.unhash(str1);
+            assert.deepEqual(numArr, randomArr);
+        });
+
+        it("throws if no match");
+
+        it("throws if words next to each other in format", function() {
+            let fhh = new FlexiHumanHash("{{test}}{{test}}");
+            let randomArr = [0b00000101, 0b00110000];
+            let str1 = fhh.hash(randomArr);
+            assert.throws(() => {
+                fhh.unhash(str1);
+            }, Error, "no separator between words in format string '{{test}}{{test}}', can't unhash");
+        });
+
+        it("throws if dangerous format");
+
+        it("undoes transform");
+        it("undoes multiple transforms");
+        it("throws on bad input");
+    });
+
+    describe("registerDictionary", function() {
+        it("throws on bad input");
+    });
+
+    describe("registerTransform", function() {
+        it("throws on bad input");
     });
 
     describe("transform", function() {
@@ -333,6 +414,84 @@ describe("FlexiHumanHash", function() {
             let fhh = new FlexiHumanHash("{{last-name}}");
             let str = fhh.hash(randomBuf);
             assert.isTrue(str === "Raleigh" || str === "Airlia");
+        });
+    });
+
+    describe("examples", function() {
+        it("Use", function() {
+            const {FlexiHumanHash} = require("..");
+            let fhh = new FlexiHumanHash("{{adjective}}-{{noun}}");
+            let str = fhh.hash();
+            console.log(str);
+        });
+
+        it("Simple hash, you provide the random numbers", function() {
+            let fhh = new FlexiHumanHash("{{adjective}}-{{adjective}}-{{noun}}-{{decimal 4}}");
+            let str = fhh.hash("edf63145-f6d3-48bf-a0b7-18e2eeb0a9dd");
+        });
+
+        it("Another format, random number provided for you", function() {
+            let fhh = new FlexiHumanHash("{{adjective}}, {{adjective}} {{noun}} {{hex 4}}");
+            let str = fhh.hash();
+        });
+
+        it("Another format, md5 hash a string for random numbers", function() {
+            let fhh = new FlexiHumanHash("{{first-name caps}}-{{last-name caps}}-{{decimal 6}}");
+            let str = fhh.hash("this is my password...", {hashAlg: "md5"});
+            console.log(str);
+        });
+
+        it("Reverse a string back to the original random number", function() {
+            let fhh = new FlexiHumanHash("{{first-name lowercase}}-{{last-name lowercase}}-the-{{adjective}}-{{noun}}");
+            let ret = fhh.unhash("francisca-straub-the-coldest-eagle");
+        });
+
+        it("Report how much entropy is used for a format to help understand likelihood of collisions", function() {
+            let fhh = new FlexiHumanHash("{{first-name uppercase}}-{{last-name uppercase}}-{{decimal 6}}");
+            console.log(fhh.entropy);
+            // Expected output (note BigInt): "70368744177664n"
+            console.log("Number of combinations:", fhh.entropy.toLocaleString());
+            // Expected output: "Number of combinations: 70,368,744,177,664"
+            console.log(`Entropy: 2^${fhh.entropyBase2}`);
+            // Expected output: "Entropy: 2^46"
+            console.log(`Entropy: 10^${fhh.entropyBase10}`);
+            // Expected output: "Entropy: 10^14"
+        });
+
+        it("Add a dictionary", function() {
+            let scientificTerms = [
+                "antigens",
+                "magnetron",
+                "nanoarchitectonics",
+                "spintronics",
+                "teflon",
+                "transistor",
+                /* ... */
+            ];
+
+            function registerScientificTerms() {
+                return {
+                    size: scientificTerms.length,
+                    getEntry: function(n) {
+                        return scientificTerms[n];
+                    },
+                };
+            }
+
+            FlexiHumanHash.registerDictionary("science", registerScientificTerms);
+            let fhh = new FlexiHumanHash("{{adjective}}:{{science}}");
+            fhh.hash();
+            // Expected output: archetypical:spintronics
+        });
+
+        it("Add a transform", function() {
+            function reverseString(str) {
+                return str.split("").reverse().join("");
+            }
+
+            FlexiHumanHash.registerTransform("reverse", reverseString, {type: "boolean"});
+            let fhh = new FlexiHumanHash("{{adjective reverse}}-{{noun reverse}}");
+            fhh.hash();
         });
     });
 });
