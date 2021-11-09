@@ -489,7 +489,7 @@ describe("FlexiHumanHash", function() {
                 return str.split("").reverse().join("");
             }
 
-            FlexiHumanHash.registerTransform("reverse", reverseString, {type: "boolean"});
+            FlexiHumanHash.registerTransform("reverse", reverseString);
             let fhh = new FlexiHumanHash("{{adjective reverse}}-{{noun reverse}}");
             fhh.hash();
         });
