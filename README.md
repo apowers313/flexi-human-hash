@@ -11,8 +11,8 @@ npm install flexi-human-hash
 
 Use
 ``` js
-const {FlexiHumanHash} = require("flexi-human-hash");
-let fhh = new FlexiHumanHash("{{adjective}}-{{noun}}");
+import { FlexiHumanHash } from "flexi-human-hash";
+const fhh = new FlexiHumanHash("{{adjective}}-{{noun}}");
 console.log(fhh.hash());
 // Expected output: "betwixt-railways"
 ```
@@ -31,35 +31,35 @@ console.log(fhh.hash());
 ## API Examples:
 Simple hash, you provide the random numbers
 ``` js
-let fhh = new FlexiHumanHash("{{adjective}}-{{adjective}}-{{noun}}-{{decimal 4}}");
+const fhh = new FlexiHumanHash("{{adjective}}-{{adjective}}-{{noun}}-{{decimal 4}}");
 fhh.hash("edf63145-f6d3-48bf-a0b7-18e2eeb0a9dd");
 // Expected output: "disagreeably-thankless-newsgirls-3149"
 ```
 
 Another format, random number provided for you
 ``` js
-let fhh = new FlexiHumanHash("{{adjective}}, {{adjective}} {{noun}} {{hex 4}}");
+const fhh = new FlexiHumanHash("{{adjective}}, {{adjective}} {{noun}} {{hex 4}}");
 fhh.hash();
 // Expected output: "stalwart, dominant attire f214"
 ```
 
 Another format, md5 hash a string for random numbers, transform names to all caps
 ``` js
-let fhh = new FlexiHumanHash("{{first-name caps}}-{{last-name caps}}-{{decimal 6}}");
+const fhh = new FlexiHumanHash("{{first-name caps}}-{{last-name caps}}-{{decimal 6}}");
 fhh.hash("this is my password...", {hashAlg: "md5"});
 // Expected output: "CHARITY-ESMERELDA-903817"
 ```
 
 Reverse a string back to the original random number
 ``` js
-let fhh = new FlexiHumanHash("{{first-name lowercase}}-{{last-name lowercase}}-the-{{adjective}}-{{noun}}");
-let ret = fhh.unhash("francisca-straub-the-coldest-eagle");
+const fhh = new FlexiHumanHash("{{first-name lowercase}}-{{last-name lowercase}}-the-{{adjective}}-{{noun}}");
+const ret = fhh.unhash("francisca-straub-the-coldest-eagle");
 // Expected output: [57, 225, 104, 232, 109, 102, 74 ]
 ```
 
 Report how much entropy is used for a format to help understand likelihood of collisions
 ``` js
-let fhh = new FlexiHumanHash("{{first-name uppercase}}-{{last-name uppercase}}-{{decimal 6}}");
+const fhh = new FlexiHumanHash("{{first-name uppercase}}-{{last-name uppercase}}-{{decimal 6}}");
 console.log(fhh.entropy);
 // Expected output (note BigInt): "70368744177664n"
 console.log("Number of combinations:", fhh.entropy.toLocaleString());
@@ -72,7 +72,7 @@ console.log(`Entropy: 10^${fhh.entropyBase10}`);
 
 Add a dictionary
 ``` js
-let scientificTerms = [
+const scientificTerms = [
     "antigens",
     "magnetron",
     "nanoarchitectonics",
@@ -92,7 +92,7 @@ function registerScientificTerms() {
 }
 
 FlexiHumanHash.registerDictionary("science", registerScientificTerms);
-let fhh = new FlexiHumanHash("{{adjective}}:{{science}}");
+const fhh = new FlexiHumanHash("{{adjective}}:{{science}}");
 fhh.hash();
 // Expected output: "archetypical:spintronics"
 ```
@@ -103,8 +103,8 @@ function reverseString(str) {
     return str.split("").reverse().join("");
 }
 
-FlexiHumanHash.registerTransform("reverse", reverseString, {type: "boolean"});
-let fhh = new FlexiHumanHash("{{adjective reverse}}-{{noun reverse}}");
+FlexiHumanHash.registerTransform("reverse", reverseString);
+const fhh = new FlexiHumanHash("{{adjective reverse}}-{{noun reverse}}");
 fhh.hash();
 // Expected output: "ydeewt-airalos"
 ```

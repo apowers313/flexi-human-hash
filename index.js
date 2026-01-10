@@ -1,14 +1,16 @@
-const FlexiHumanHash = require("./lib/FlexiHumanHash.js");
-const FlexiArrayDict = require("./lib/FlexiArrayDict.js");
-const FlexiDict = require("./lib/FlexiDict.js");
-const RandomSource = require("./lib/RandomSource.js");
+import FlexiHumanHash from "./lib/FlexiHumanHash.js";
+import FlexiArrayDict from "./lib/FlexiArrayDict.js";
+import FlexiDict from "./lib/FlexiDict.js";
+import RandomSource from "./lib/RandomSource.js";
+import defaultDicts from "./lib/defaultDicts.js";
+import defaultTransforms from "./lib/defaultTransforms.js";
 
 // register default dictionaries
-require("./lib/defaultDicts").forEach((d) => FlexiHumanHash.registerDictionary(d.name, d.createFn));
+defaultDicts.forEach((d) => FlexiHumanHash.registerDictionary(d.name, d.createFn));
 // register default transforms
-require("./lib/defaultTransforms").forEach((t) => FlexiHumanHash.registerTransform(t.name, t.transformFn, t.u));
+defaultTransforms.forEach((t) => FlexiHumanHash.registerTransform(t.name, t.transformFn, t.undoFn));
 
-module.exports = {
+export {
     FlexiHumanHash,
     FlexiArrayDict,
     FlexiDict,

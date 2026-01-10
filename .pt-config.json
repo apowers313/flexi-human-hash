@@ -1,0 +1,35 @@
+{
+  "promptDirs": [
+    "/home/apowers/Projects/flexi-human-hash/.prompts",
+    "node_modules/pupt/prompts"
+  ],
+  "historyDir": "/home/apowers/Projects/flexi-human-hash/.pthistory",
+  "defaultCmd": "claude",
+  "defaultCmdArgs": [
+    "--permission-mode",
+    "acceptEdits"
+  ],
+  "defaultCmdOptions": {
+    "Continue with last context?": "--continue"
+  },
+  "autoReview": true,
+  "autoRun": true,
+  "gitPromptDir": "/home/apowers/Projects/flexi-human-hash/.git-prompts",
+  "handlebarsExtensions": [],
+  "version": "4.0.0",
+  "outputCapture": {
+    "enabled": false,
+    "directory": "/home/apowers/Projects/flexi-human-hash/.pt-output",
+    "maxSizeMB": 50,
+    "retentionDays": 30
+  },
+  "autoAnnotate": {
+    "enabled": false,
+    "triggers": [
+      "claude",
+      "ai",
+      "assistant"
+    ],
+    "analysisPrompt": "analyze-execution"
+  }
+}

@@ -7,3 +7,9 @@ coverage
 *~
 docs.json
 tmp
+
+
+# PUPT
+.pt-config.json.backup
+.pthistory
+.git-prompts
