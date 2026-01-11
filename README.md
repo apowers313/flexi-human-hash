@@ -1,4 +1,9 @@
 ## flexi-human-hash
+
+[![npm version](https://img.shields.io/npm/v/flexi-human-hash.svg)](https://www.npmjs.com/package/flexi-human-hash)
+[![CI/CD Pipeline](https://github.com/apowers313/flexi-human-hash/actions/workflows/ci.yml/badge.svg)](https://github.com/apowers313/flexi-human-hash/actions/workflows/ci.yml)
+[![Coverage Status](https://coveralls.io/repos/github/apowers313/flexi-human-hash/badge.svg?branch=master)](https://coveralls.io/github/apowers313/flexi-human-hash?branch=master)
+
 There are lots of packages that convert big random numbers to something readable or create random strings from words, but none are as flexible as I wanted. I created this to be a highly controllable version of the other human hash packages.
 
 Note that this package is well tested and fairly stable, so don't expect to see many changes unless new GitHub issues are opened.
