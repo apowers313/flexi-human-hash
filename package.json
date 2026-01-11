@@ -1,7 +1,7 @@
 {
   "name": "flexi-human-hash",
   "description": "Making hashes human readable, and giving the user control over how they look",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "type": "module",
   "exports": {
     ".": {
