@@ -57,9 +57,13 @@ fhh.hash("this is my password...", {hashAlg: "md5"});
 
 Reverse a string back to the original random number
 ``` js
-const fhh = new FlexiHumanHash("{{first-name lowercase}}-{{last-name lowercase}}-the-{{adjective}}-{{noun}}");
-const ret = fhh.unhash("francisca-straub-the-coldest-eagle");
-// Expected output: [57, 225, 104, 232, 109, 102, 74 ]
+// Note: Use separators that don't appear in dictionary words to ensure unhashing works
+// Some names contain hyphens (e.g., "Ann-Marie"), so "_" is safer than "-"
+const fhh = new FlexiHumanHash("{{first-name lowercase}}_{{last-name lowercase}}_the_{{adjective}}_{{noun}}");
+const randomArr = [57, 225, 104, 232, 109, 102, 74];
+const str = fhh.hash(randomArr);
+const ret = fhh.unhash(str);
+// ret equals randomArr
 ```
 
 Report how much entropy is used for a format to help understand likelihood of collisions
@@ -153,6 +157,84 @@ flexihash "{{first-name}}-{{last-name}}" < file
 * city
     * 138,398 city names from [all-the-cities](https://www.npmjs.com/package/all-the-cities)
 
+## Unhashing (Reversing Hashes)
+
+The `unhash()` method converts a human-readable hash string back to the original random bytes. This is useful when you need to recover the original data from a hash.
+
+### Basic Usage
+``` js
+const fhh = new FlexiHumanHash("{{adjective}}_{{noun}}_{{decimal 4}}");
+const randomArr = [0x12, 0x34, 0x56];
+const str = fhh.hash(randomArr);  // e.g., "fuzzy_cat_1234"
+const recovered = fhh.unhash(str); // returns [0x12, 0x34, 0x56]
+```
+
+### Validation
+
+Not all format strings can be unhashed. The library provides validation to catch problems early and give you clear error messages explaining what needs to be fixed.
+
+**Eager validation (recommended)**: Validate at construction time with `validateUnhash: true`. This catches problems immediately so you can fix your format string:
+``` js
+const fhh = new FlexiHumanHash("{{first-name}}-{{last-name}}", { validateUnhash: true });
+// Throws immediately with a helpful message:
+// Error: Format is not unhashable: dictionary word "Ann-Marie" contains separator "-"
+//
+// The error tells you exactly what's wrong: the name "Ann-Marie" in the first-name
+// dictionary contains a hyphen, which is the same character you're using as a separator.
+// Solution: use a different separator like "_" or ":"
+```
+
+**Lazy validation (default)**: Validation happens on the first `unhash()` call:
+``` js
+const fhh = new FlexiHumanHash("{{first-name}}-{{last-name}}");
+fhh.hash("some-uuid"); // Works fine for hashing
+fhh.unhash("John-Smith"); // Error thrown here on first unhash attempt
+```
+
+### Common Validation Errors
+
+The validation checks for several issues and provides specific error messages:
+
+| Error Message | What It Means | How to Fix |
+|--------------|---------------|------------|
+| `dictionary word "X" contains separator "Y"` | A word in your dictionary contains characters you're using as a separator. This makes parsing ambiguous. | Use a different separator that doesn't appear in dictionary words. Try `_`, `:`, or `\|`. |
+| `no separator between words in format string` | Your format has adjacent dictionary placeholders like `{{noun}}{{verb}}`. | Add a separator between placeholders: `{{noun}}_{{verb}}`. |
+| `empty separator between words` | There's nothing between two dictionary placeholders. | Add a separator character between them. |
+| `transform "X" does not have an undo function` | A custom transform doesn't support being reversed. | Add an `undoFn` when registering the transform. |
+
+### Runtime Errors
+
+These errors occur when calling `unhash()` with a string that doesn't match the format:
+
+| Error Message | What It Means | How to Fix |
+|--------------|---------------|------------|
+| `Unable to parse string for unhashing: "X"` | The input string doesn't match the expected format structure. | Verify the string was produced by `hash()` with the same format. Check that separators match. |
+| `word not found while unhashing: X` | A word in the string isn't in the expected dictionary. | Verify the string hasn't been modified. Check that you're using the same dictionaries. |
+
+### Tips for Unhashable Formats
+
+When designing formats that need to support unhashing:
+
+1. **Use uncommon separators**: Characters like `_`, `:`, `|`, or multi-character separators like `::` or `--` are less likely to appear in dictionary words.
+
+2. **Test with validation enabled**: Always use `{ validateUnhash: true }` during development to catch issues early.
+
+3. **Consider your dictionaries**: Some dictionaries are safer than others:
+   - `adjective`, `noun`, `verb`: Generally safe with most separators
+   - `first-name`, `last-name`: May contain hyphens (e.g., "Ann-Marie", "O'Brien")
+   - `city`: May contain spaces and hyphens (e.g., "New York", "Winston-Salem")
+
+4. **For custom dictionaries**: Ensure your words don't contain your chosen separator character.
+
+### Entropy Considerations
+
+The unhash operation only recovers the bits of entropy encoded in the format. If your input has more bits than the format's entropy, the extra bits are lost:
+``` js
+const fhh = new FlexiHumanHash("{{test}}"); // 3 bits of entropy
+fhh.hash([0b11111111]); // Only uses first 3 bits
+fhh.unhash("slug"); // Returns [0b11100000], last 5 bits are 0
+```
+
 ## Transforms
 Note: transforms with "=" in them must come last, because [Handlebars](https://handlebarsjs.com/). e.g. "{{noun uppercase max-length=4}}" works, but "{{noun max-length=4 uppercase}}" will throw a parsing error.
 
@@ -178,23 +260,35 @@ Note: transforms with "=" in them must come last, because [Handlebars](https://h
 ## API
 * FlexiHumanHash
     * Class, constructor takes a `format` string and an options object
-    * e.g. `new FlexiHumanHash(formatString)`
+    * e.g. `new FlexiHumanHash(formatString, options)`
+    * Constructor options:
+        * `validateUnhash`: (boolean, default: false) If true, validates at construction time that the format can be unhashed. Throws an error if the format contains ambiguities (e.g., dictionary words containing separator characters).
     * `hash(randomness, options)`: uses randomness to create a string in the specified format
         * `randomness` can be a: string, array of numbers, iterable of numbers, TypedArray, ArrayBuffer
         * options:
             * hashAlg: a string passed to [Node Crypto createHash](https://nodejs.org/api/crypto.html#class-hash). The algorithm must be acceptable by the local installation of OpenSSL ("sha256" is a good guess if you don't know better). If used, `randomness` must be an argument acceptable to Node Crypto's hash `.update()` function.
             * hashSalt: Used in combination with `hashAlg` -- is passed to the `.update()` method before `randomness` to create a different output hash. Must be an argument acceptable to Node Crypto's hash `.update()` function.
+    * `unhash(str)`: converts a human-readable hash string back to the original random bytes
+        * Returns an array of numbers (bytes)
+        * Throws an error if:
+            * The format is not unhashable (ambiguous separators, etc.)
+            * The string cannot be parsed (words not found in dictionaries)
+        * See "Unhashing" section above for important considerations
+    * `entropy`: (BigInt) Returns the number of possible combinations
+    * `entropyBase2`: (number) Returns the entropy in bits
+    * `entropyBase10`: (number) Returns the entropy as a power of 10
 * FlexiHumanHash.registerDictionary(name, registerFn)
     * `name` of the dictionary that will be used in the format
         * e.g. `name` = "foo" becomes "{{foo}}"
     * `registerFn` returns an object with:
         * size: number of entries in the dictionary
         * getEntry: function with one arg (n), that returns the Nth entry of the dictionary
-* FlexiHumanHash.registerTransform(name, transformFn, reverseFn)
+        * reverseLookup: (optional) function with one arg (str), returns the index of the word or -1. Required for unhashing support.
+* FlexiHumanHash.registerTransform(name, transformFn, undoFn)
     * `name` of the transform that will be used in the format
         * e.g. `name` = "bar" becomes "{{noun bar}}"
     * `transformFn` is a function with one argument, the word that will be transformed. Returns the transformed word.
-    * `reverseFn` TODO
+    * `undoFn` is a function that reverses the transform. Required for unhashing support with custom transforms.
 
 ## Similar packages
 * [Project Name Generator](https://www.npmjs.com/package/project-name-generator)
