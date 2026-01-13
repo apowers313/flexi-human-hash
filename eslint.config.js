@@ -9,6 +9,7 @@ export default [
             "coverage/**",
             "*.tgz",
             ".husky/**",
+            "tmp/**",
         ],
     },
     {

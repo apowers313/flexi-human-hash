@@ -1461,8 +1461,8 @@ describe("empty dictionary regression tests", function() {
     it("should throw clean error for custom dictionary with size 0", function() {
         class ZeroSizeDict {
             get size() { return 0; }
-            getEntry(n) { return "never"; }
-            reverseLookup(str) { return -1; }
+            getEntry(_n) { return "never"; }
+            reverseLookup(_str) { return -1; }
             get maxWordLength() { return 5; }
         }
 
@@ -1767,8 +1767,8 @@ describe("transform edge cases regression tests", function() {
 
     it("should handle transform throwing error with clear message", function() {
         FlexiHumanHash.registerTransform("throwing2",
-            (str) => { throw new Error("Intentional transform error"); },
-            (str) => str
+            (_str) => { throw new Error("Intentional transform error"); },
+            (_str) => _str
         );
 
         const throwDict = ["word"];
@@ -1794,8 +1794,8 @@ describe("transform edge cases regression tests", function() {
 
     it("should handle transform returning null", function() {
         FlexiHumanHash.registerTransform("nulltrans2",
-            (str) => null,
-            (str) => str
+            (_str) => null,
+            (_str) => _str
         );
 
         const nullDict = ["word"];
@@ -1811,11 +1811,11 @@ describe("transform edge cases regression tests", function() {
         assert.isTrue(hash.includes("null"), "null is coerced to 'null' string");
 
         // This then may fail to unhash depending on validation
-        let unhashError = null;
+        let _unhashError = null;
         try {
             fhh.unhash(hash);
         } catch (e) {
-            unhashError = e;
+            _unhashError = e;
         }
 
         // "null" isn't in the dictionary, so unhash should fail
